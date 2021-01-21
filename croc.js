@@ -20,9 +20,13 @@ let currentTheme = '';
 
 app.set("view engine", "hbs");
 
-app.get('/', (req, res) => {
+app.get('/crocodile', (req, res) => {
     res.render('croc.hbs', {
     });
+});
+
+app.get('/crocodile', (req, res) => {
+    res.send('Hello World')
 });
 
 app.post('/postcomment', urlencodedParser, (req, res) => {
