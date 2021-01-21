@@ -11,7 +11,6 @@ const io = require('socket.io')(server, {
 })
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 const port = process.env.PORT;
-let comments = [];
 let names = [];
 let nm = ['Alice', 'Kirito', 'Kisagama', 'Asegawa', 'Kurosao']
 let themes = ['Чуи', 'Стринги', 'Дарт Вейдер', 'Декольте', 'Лиса', 'Волк', 'Выдра', 'Бегемот', 'Стриптиз', 'Кетчуп', 'Яблоко', 'Кристалл', 'Чайник', 'Подушка', 'Кроссовок'];
@@ -29,13 +28,16 @@ app.get('/', (req, res) => {
     res.send('Hello World')
 });
 
+app.get('/res', (req, res) => {
+    names = [];
+});
+
 app.post('/postcomment', urlencodedParser, (req, res) => {
     let message = {
         "name": req.body.nickname,
         "comment": req.body.comment
     };
     io.emit('comment', message);
-    comments.push(message);
 });
 
 io.sockets.on('connection', socket => {
