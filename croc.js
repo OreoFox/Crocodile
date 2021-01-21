@@ -10,11 +10,12 @@ const io = require('socket.io')(server, {
     }
 })
 const urlencodedParser = bodyParser.urlencoded({extended: false});
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 let names = [];
 let nm = ['Alice', 'Kirito', 'Kisagama', 'Asegawa', 'Kurosao']
 let themes = ['Чуи', 'Стринги', 'Дарт Вейдер', 'Декольте', 'Лиса', 'Волк', 'Выдра', 'Бегемот', 'Стриптиз', 'Кетчуп', 'Яблоко', 'Кристалл', 'Чайник', 'Подушка', 'Кроссовок'];
 let currentTheme = '';
+let currentDrawer = '';
 
 
 app.set("view engine", "hbs");
@@ -42,9 +43,11 @@ app.post('/postcomment', urlencodedParser, (req, res) => {
 
 io.sockets.on('connection', socket => {
     socket.on('image', data => {
-        setTimeout(() => {
-            io.emit('draw', data);
-        }, 1000)
+        if (data.name == currentDrawer) {
+            io.emit('draw', data.img);
+        } else {
+            
+        }
     });
     socket.on('comment', data => {
         if (data == currentTheme) {
@@ -86,6 +89,7 @@ function changeDrawer() {
         "theme": theme
     }
     console.log(drawer);
+    currentDrawer = drawer;
     io.emit('changeDrawer', data);
     io.emit('amIDraw', drawer);
 }

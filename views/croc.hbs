@@ -18,7 +18,7 @@
     <div class="chat">
         {{!-- Users chat --}}
         <div id="form">
-            <form action="/postcomment" method="post" onsubmit="return 0">
+            <form id="dm" action="/postcomment" method="post">
                 <div class="flex">
                     <input type="text" name="comment" id="comm" autocomplete="off">
                     <input type="text" name="nickname" class="hidden" id="namefield">
@@ -33,6 +33,7 @@
 </body>
 {{!-- Soket.io library --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.js" integrity="sha512-+l9L4lMTFNy3dEglQpprf7jQBhQsQ3/WvOnjaN/+/L4i0jOstgScV0q2TjfvRF4V+ZePMDuZYIQtg5T4MKr+MQ==" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 {{!-- Custom JS --}}
 <script>
     // Defining variables
@@ -44,10 +45,11 @@
     let comment = document.getElementById('comm');
     let nd = document.getElementById('nowdrawing');
     let namefield = document.getElementById('namefield');
+    let dm = document.getElementById('dm')
     let rectSize = 5;
     let fill = false;
     let ctx = canvas.getContext('2d');
-    let isDrawing;
+    let isDrawing = false;
 
     // Set name list
     let names = ['Horny', 'Dick', 'LoveDicks', 'Sucking', 'Cumming', 'YourClubBoddy', 'GachiBoy', 'LoveFisting', 'LoveAnal']
@@ -60,6 +62,19 @@
         "name": name,
         "id": id
     }
+
+    $('#dm').submit(function(e){
+        e.preventDefault();
+        $.ajax({
+            url:'/postcomment',
+            type:'post',
+            data:$('#dm').serialize(),
+            success:function(){
+                return;
+            }
+        });
+    });
+
     // Emmit name to server
     socket.emit('setname', data);
     namefield.value = name;
@@ -86,24 +101,27 @@
         socket.emit('comment', data.comment);
     });
 
-    // Update Canvas
-    socket.on('draw', (data) => {
-        let image = new Image();
-        image.src = data;
-        ctx.drawImage(image, 0, 0);
-    });
-
     // New drawer cames here
     socket.on('changeDrawer', (data) => {
         console.log(data, name)
         if (name == data.drawer) {
-            isDrawing = true;
             nd.innerHTML = "<hr>Now Drawing: You<hr><p>" + data.theme + "</p>"
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            setInterval(() => {
+                let imgdata = canvas.toDataURL();
+                let data = {
+                    "img": imgdata,
+                    "name": name
+                }
+                socket.emit('image', data);
+            }, 100);
+            return isDrawing = true;
         } else {
-            isDrawing = false;
             nd.innerHTML = "<hr>Now Drawing: " + data.drawer + "<hr>"
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            return isDrawing = false;
         }
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
     });
 
     // Check how currently draw
@@ -119,6 +137,13 @@
     socket.on('win', (data) => {
         chat.innerHTML = "";
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    // Update Canvas
+    socket.on('draw', (data) => {
+        let image = new Image();
+        image.src = data;
+        ctx.drawImage(image, 0, 0);
     });
 
     // Draw functions
@@ -147,12 +172,11 @@
         }
     })
 
-    canvas.addEventListener('mousemove', e => {
-        setTimeout(() => {
-            let imgdata = canvas.toDataURL();
-            socket.emit('image', imgdata);
-        }, 1000)
-    })
+    if (isDrawing) {
+        
+    }
+    
+    
 
 </script>
 
