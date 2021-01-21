@@ -10,7 +10,7 @@ const io = require('socket.io')(server, {
     }
 })
 const urlencodedParser = bodyParser.urlencoded({extended: false});
-const port = 3000;
+const port = process.env.PORT;
 let comments = [];
 let names = [];
 let nm = ['Alice', 'Kirito', 'Kisagama', 'Asegawa', 'Kurosao']
