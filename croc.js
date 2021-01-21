@@ -1,7 +1,7 @@
 const screenshot = require('screenshot-desktop');
 const fs = require('fs');
 const bodyParser = require("body-parser");
-const ngrok = require('ngrok');
+// const ngrok = require('ngrok');
 const express = require('express');
 const path = require('path');
 const hbs = require("hbs");
@@ -19,7 +19,7 @@ const port = 3000;
 let comments = [];
 let names = [];
 let nm = ['Alice', 'Kirito', 'Kisagama', 'Asegawa', 'Kurosao']
-let themes = ['Чуи', 'Стринги', 'Дарт Вейдер', 'Декольте', 'Лиса', 'Волк', 'Выдра', 'Бегемот', 'Стриптиз', 'Кетчуп'];
+let themes = ['Чуи', 'Стринги', 'Дарт Вейдер', 'Декольте', 'Лиса', 'Волк', 'Выдра', 'Бегемот', 'Стриптиз', 'Кетчуп', 'Яблоко', 'Кристалл', 'Чайник', 'Подушка', 'Кроссовок'];
 let currentTheme = '';
 
 
@@ -92,6 +92,6 @@ function changeDrawer() {
 
 server.listen(port, async () => {
     console.log(`Started`);
-    const url = await ngrok.connect(3000);
-    console.log(url);
+    // const url = await ngrok.connect(3000);
+    // console.log(url);
 });
