@@ -8,6 +8,7 @@
 <body>
     <div class="canv">
         {{!-- Main game canvas --}}
+        <p id="holder"><svg class="erase" id="eraser" enable-background="new 0 0 300 300" height="512" viewBox="0 0 300 300" width="512" xmlns="http://www.w3.org/2000/svg"><g><g fill="#4c241d"><path d="m57.656 71.656c-1.023 0-2.047-.391-2.828-1.172l-11.312-11.312c-1.562-1.562-1.562-4.094 0-5.656s4.094-1.562 5.656 0l11.312 11.312c1.562 1.562 1.562 4.094 0 5.656-.781.782-1.804 1.172-2.828 1.172z"/><path d="m46.344 71.656c-1.023 0-2.047-.391-2.828-1.172-1.562-1.562-1.562-4.094 0-5.656l11.312-11.312c1.562-1.562 4.094-1.562 5.656 0s1.562 4.094 0 5.656l-11.312 11.312c-.781.782-1.805 1.172-2.828 1.172z"/><circle cx="68" cy="230" r="4"/><circle cx="188" cy="242" r="4"/><circle cx="212" cy="222" r="4"/><circle cx="232" cy="234" r="4"/><circle cx="60" cy="206" r="4"/></g><circle cx="178" cy="124" fill="#ffc7c7" r="86"/><path d="m248 262h-208c-2.211 0-4-1.791-4-4s1.789-4 4-4h208c2.211 0 4 1.791 4 4s-1.789 4-4 4z" fill="#4c241d"/><path d="m100 86c-2.211 0-4-1.791-4-4v-12c0-2.209 1.789-4 4-4s4 1.791 4 4v12c0 2.209-1.789 4-4 4z" fill="#4c241d"/><path d="m100 114c-2.211 0-4-1.791-4-4v-12c0-2.209 1.789-4 4-4s4 1.791 4 4v12c0 2.209-1.789 4-4 4z" fill="#4c241d"/><path d="m92 94h-12c-2.211 0-4-1.791-4-4s1.789-4 4-4h12c2.211 0 4 1.791 4 4s-1.789 4-4 4z" fill="#4c241d"/><path d="m120 94h-12c-2.211 0-4-1.791-4-4s1.789-4 4-4h12c2.211 0 4 1.791 4 4s-1.789 4-4 4z" fill="#4c241d"/><path d="m164 70c-6.617 0-12-5.383-12-12s5.383-12 12-12 12 5.383 12 12-5.383 12-12 12zm0-16c-2.207 0-4 1.795-4 4s1.793 4 4 4 4-1.795 4-4-1.793-4-4-4z" fill="#4c241d"/><g><path d="m195.113 201.113-62.225-62.225 49.296-49.296c7.141-7.141 18.718-7.141 25.859 0l36.367 36.367c7.141 7.141 7.141 18.718 0 25.859z" fill="#6b4f5b"/><path d="m195.113 205.113c-1.023 0-2.047-.391-2.828-1.172l-62.227-62.227c-.75-.75-1.172-1.768-1.172-2.828s.422-2.078 1.172-2.828l49.297-49.295c8.688-8.688 22.828-8.691 31.516 0l36.367 36.365c8.688 8.689 8.688 22.826 0 31.516l-49.297 49.297c-.781.782-1.804 1.172-2.828 1.172zm-56.57-66.226 56.57 56.57 46.469-46.469c5.57-5.57 5.57-14.633 0-20.203l-36.367-36.365c-5.574-5.574-14.637-5.57-20.203 0z" fill="#4c241d"/></g><g><path d="m111.549 242h42.676l40.887-40.888-62.226-62.225-49.296 49.296c-7.141 7.141-7.141 18.718 0 25.859z" fill="#fff"/><path d="m154.227 246h-42.676c-1.062 0-2.078-.422-2.828-1.172l-27.961-27.957c-8.688-8.689-8.688-22.826 0-31.516l49.297-49.297c1.562-1.562 4.094-1.562 5.656 0l62.227 62.227c1.562 1.562 1.562 4.094 0 5.656l-40.887 40.887c-.75.75-1.766 1.172-2.828 1.172zm-41.02-8h39.363l36.887-36.887-56.57-56.57-46.469 46.469c-5.57 5.57-5.57 14.633 0 20.203z" fill="#4c241d"/></g></g></svg></p>
         <canvas id="canv" width="1400" height="288" class="canvas" oncontextmenu="return false"></canvas>
     </div>
     
@@ -45,7 +46,8 @@
     let comment = document.getElementById('comm');
     let nd = document.getElementById('nowdrawing');
     let namefield = document.getElementById('namefield');
-    let dm = document.getElementById('dm')
+    let dm = document.getElementById('dm');
+    let erase = document.getElementById('holder');
     let rectSize = 5;
     let fill = false;
     let ctx = canvas.getContext('2d');
@@ -62,6 +64,15 @@
         "name": name,
         "id": id
     }
+
+    erase.addEventListener('click', e => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        socket.emit('clear', name);
+    });
+
+    socket.on('clear', data => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    })
 
     $('#dm').submit(function(e){
         e.preventDefault();
@@ -107,6 +118,7 @@
         if (name == data.drawer) {
             nd.innerHTML = "<hr>Now Drawing: You<hr><p>" + data.theme + "</p>"
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            socket.emit('clear', name);
             setInterval(() => {
                 let imgdata = canvas.toDataURL();
                 let data = {
@@ -119,6 +131,7 @@
         } else {
             nd.innerHTML = "<hr>Now Drawing: " + data.drawer + "<hr>"
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            socket.emit('clear', name);
             return isDrawing = false;
         }
         
@@ -128,8 +141,10 @@
     socket.on('amIDraw', (data) => {
         if (name == data) {
             form.style.setProperty("display", "none");
+            erase.style.setProperty("display", "inherit");
         } else {
             form.style.setProperty("display", "inherit");
+            erase.style.setProperty("display", "none");
         }
     });
 
@@ -137,6 +152,7 @@
     socket.on('win', (data) => {
         chat.innerHTML = "";
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        socket.emit('clear', name);
     });
 
     // Update Canvas
@@ -167,17 +183,10 @@
     canvas.addEventListener('mousemove', e => {
         if (fill) {
             if (isDrawing) {
-                ctx.fillRect(e.clientX - 2, e.clientY - 5, rectSize, rectSize);
+                ctx.fillRect(e.clientX - 3, e.clientY - 19, rectSize, rectSize);
             }
         }
     })
-
-    if (isDrawing) {
-        
-    }
-    
-    
-
 </script>
 
 <style>
@@ -186,6 +195,13 @@
         padding: 0;
         background: #EFF7CF;
         font-family: sans-serif;
+    }
+
+    .erase {
+        position: absolute;
+        left: 92%;
+        bottom: 60%;
+        width: 5%;
     }
 
     .hidden {

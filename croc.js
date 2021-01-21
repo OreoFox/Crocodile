@@ -49,10 +49,16 @@ io.sockets.on('connection', socket => {
             
         }
     });
+    socket.on('clear', data => {
+        if (data == currentDrawer) {
+            io.emit('clear', data);
+        }
+    });
     socket.on('comment', data => {
         if (data == currentTheme) {
             changeDrawer();
             io.emit('win')
+            io.emit('clear', data);
         }
     });
     socket.on('setname', data => {
@@ -77,6 +83,7 @@ io.sockets.on('connection', socket => {
 });
 
 function changeDrawer() {
+    io.emit('clear', 0);
     let drawer = '';
     let theme = '';
     let num = Math.floor(Math.random() * names.length);
