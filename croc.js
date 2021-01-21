@@ -1,9 +1,5 @@
-const screenshot = require('screenshot-desktop');
-const fs = require('fs');
 const bodyParser = require("body-parser");
-// const ngrok = require('ngrok');
 const express = require('express');
-const path = require('path');
 const hbs = require("hbs");
 const app = express();
 const server = require('http').Server(app);
@@ -91,6 +87,4 @@ function changeDrawer() {
 
 server.listen(port, async () => {
     console.log(`Started`);
-    // const url = await ngrok.connect(3000);
-    // console.log(url);
 });
