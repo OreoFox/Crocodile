@@ -21,9 +21,7 @@ let currentTheme = '';
 app.set("view engine", "hbs");
 
 app.get('/', (req, res) => {
-    res.render('croc.hbs', {
-        comments: comments
-    })
+    res.send('croc.html')
 });
 
 app.post('/postcomment', urlencodedParser, (req, res) => {
